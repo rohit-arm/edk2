@@ -52,6 +52,7 @@
   PeCoffLib
   ReportStatusCodeLib
   StandaloneMmCoreEntryPoint
+  HobPrintLib
 
 [Protocols]
   gEfiDxeMmReadyToLockProtocolGuid             ## UNDEFINED # SmiHandlerRegister
@@ -75,6 +76,9 @@
   gEfiEventLegacyBootGuid
   gEfiEventExitBootServicesGuid
   gEfiEventReadyToBootGuid
+
+[Pcd]
+  gStandaloneMmPkgTokenSpaceGuid.PcdFwVolMmMaxEncapsulationDepth    ##CONSUMES
 
 #
 # This configuration fails for CLANGPDB, which does not support PIE in the GCC

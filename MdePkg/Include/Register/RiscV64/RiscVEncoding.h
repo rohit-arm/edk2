@@ -96,6 +96,9 @@
 /* Supervisor Protection and Translation */
 #define CSR_SATP  0x180
 
+/* Sstc extension */
+#define CSR_STIMECMP  0x14D
+
 /* Trap/Exception Causes */
 #define CAUSE_MISALIGNED_FETCH          0x0
 #define CAUSE_FETCH_ACCESS              0x1
@@ -116,5 +119,15 @@
 #define CAUSE_LOAD_GUEST_PAGE_FAULT     0x15
 #define CAUSE_VIRTUAL_INST_FAULT        0x16
 #define CAUSE_STORE_GUEST_PAGE_FAULT    0x17
+
+/* Sstc extension */
+#define CSR_SEED  0x15
+
+#define SEED_OPST_MASK     0xc0000000
+#define SEED_OPST_BIST     0x00000000
+#define SEED_OPST_WAIT     0x40000000
+#define SEED_OPST_ES16     0x80000000
+#define SEED_OPST_DEAD     0xc0000000
+#define SEED_ENTROPY_MASK  0xffff
 
 #endif

@@ -2,7 +2,7 @@
   The XHCI controller driver.
 
 (C) Copyright 2023 Hewlett Packard Enterprise Development LP<BR>
-Copyright (c) 2011 - 2022, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2011 - 2023, Intel Corporation. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -86,10 +86,10 @@ EFI_USB2_HC_PROTOCOL  gXhciUsb2HcTemplate = {
   0x0
 };
 
-UINT64   mPerformanceCounterStartValue;
-UINT64   mPerformanceCounterEndValue;
-UINT64   mPerformanceCounterFrequency;
-BOOLEAN  mPerformanceCounterValuesCached = FALSE;
+static UINT64   mXhciPerformanceCounterStartValue;
+static UINT64   mXhciPerformanceCounterEndValue;
+static UINT64   mXhciPerformanceCounterFrequency;
+static BOOLEAN  mXhciPerformanceCounterValuesCached = FALSE;
 
 /**
   Retrieves the capability of root hub ports.
@@ -825,7 +825,10 @@ XhcTransfer (
   *TransferResult = Urb->Result;
   *DataLength     = Urb->Completed;
 
-  if ((*TransferResult == EFI_USB_ERR_STALL) || (*TransferResult == EFI_USB_ERR_BABBLE)) {
+  //
+  // Based on XHCI spec 4.8.3, software should do the reset endpoint while USB Transaction occur.
+  //
+  if ((*TransferResult == EFI_USB_ERR_STALL) || (*TransferResult == EFI_USB_ERR_BABBLE) || (*TransferResult == EDKII_USB_ERR_TRANSACTION)) {
     ASSERT (Status == EFI_DEVICE_ERROR);
     RecoveryStatus = XhcRecoverHaltedEndpoint (Xhc, Urb);
     if (EFI_ERROR (RecoveryStatus)) {
@@ -2318,17 +2321,17 @@ XhcConvertTimeToTicks (
   UINTN   Shift;
 
   // Cache the return values to avoid repeated calls to GetPerformanceCounterProperties ()
-  if (!mPerformanceCounterValuesCached) {
-    mPerformanceCounterFrequency = GetPerformanceCounterProperties (
-                                     &mPerformanceCounterStartValue,
-                                     &mPerformanceCounterEndValue
-                                     );
+  if (!mXhciPerformanceCounterValuesCached) {
+    mXhciPerformanceCounterFrequency = GetPerformanceCounterProperties (
+                                         &mXhciPerformanceCounterStartValue,
+                                         &mXhciPerformanceCounterEndValue
+                                         );
 
-    mPerformanceCounterValuesCached = TRUE;
+    mXhciPerformanceCounterValuesCached = TRUE;
   }
 
   // Prevent returning a tick value of 0, unless Time is already 0
-  if (0 == mPerformanceCounterFrequency) {
+  if (0 == mXhciPerformanceCounterFrequency) {
     return Time;
   }
 
@@ -2342,7 +2345,7 @@ XhcConvertTimeToTicks (
   //
   Ticks = MultU64x64 (
             DivU64x64Remainder (
-              mPerformanceCounterFrequency,
+              mXhciPerformanceCounterFrequency,
               Divisor,
               &Remainder
               ),
@@ -2384,12 +2387,12 @@ XhcGetElapsedTicks (
   //
   // Determine if the counter is counting up or down
   //
-  if (mPerformanceCounterStartValue < mPerformanceCounterEndValue) {
+  if (mXhciPerformanceCounterStartValue < mXhciPerformanceCounterEndValue) {
     //
     // Counter counts upwards, check for an overflow condition
     //
     if (*PreviousTick > CurrentTick) {
-      Delta = (mPerformanceCounterEndValue - *PreviousTick) + CurrentTick;
+      Delta = (mXhciPerformanceCounterEndValue - *PreviousTick) + CurrentTick;
     } else {
       Delta = CurrentTick - *PreviousTick;
     }
@@ -2398,7 +2401,7 @@ XhcGetElapsedTicks (
     // Counter counts downwards, check for an underflow condition
     //
     if (*PreviousTick < CurrentTick) {
-      Delta = (mPerformanceCounterStartValue - CurrentTick) + *PreviousTick;
+      Delta = (mXhciPerformanceCounterStartValue - CurrentTick) + *PreviousTick;
     } else {
       Delta = *PreviousTick - CurrentTick;
     }

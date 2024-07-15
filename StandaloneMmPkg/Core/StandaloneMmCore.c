@@ -10,11 +10,6 @@
 #include "StandaloneMmCore.h"
 
 EFI_STATUS
-MmCoreFfsFindMmDriver (
-  IN  EFI_FIRMWARE_VOLUME_HEADER  *FwVolHeader
-  );
-
-EFI_STATUS
 MmDispatcher (
   VOID
   );
@@ -517,6 +512,10 @@ StandaloneMmMain (
 
   DEBUG ((DEBUG_INFO, "MmMain - 0x%x\n", HobStart));
 
+  DEBUG_CODE (
+    PrintHobList (HobStart, NULL);
+    );
+
   //
   // Determine if the caller has passed a reference to a MM_CORE_PRIVATE_DATA
   // structure in the Hoblist. This choice will govern how boot information is
@@ -643,7 +642,7 @@ StandaloneMmMain (
   //
   DEBUG ((DEBUG_INFO, "Mm Dispatch StandaloneBfvAddress - 0x%08x\n", gMmCorePrivate->StandaloneBfvAddress));
   if (gMmCorePrivate->StandaloneBfvAddress != 0) {
-    MmCoreFfsFindMmDriver ((EFI_FIRMWARE_VOLUME_HEADER *)(UINTN)gMmCorePrivate->StandaloneBfvAddress);
+    MmCoreFfsFindMmDriver ((EFI_FIRMWARE_VOLUME_HEADER *)(UINTN)gMmCorePrivate->StandaloneBfvAddress, 0);
     MmDispatcher ();
   }
 

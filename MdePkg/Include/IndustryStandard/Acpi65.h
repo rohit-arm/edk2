@@ -19,6 +19,16 @@
 #pragma pack(1)
 
 ///
+/// _PSD Revision for ACPI 6.5
+///
+#define EFI_ACPI_6_5_AML_PSD_REVISION  0
+
+///
+/// _CPC Revision for ACPI 6.5
+///
+#define EFI_ACPI_6_5_AML_CPC_REVISION  3
+
+///
 /// ACPI 6.5 Generic Address Space definition
 ///
 typedef struct {
@@ -43,6 +53,7 @@ typedef struct {
 #define EFI_ACPI_6_5_GENERAL_PURPOSE_IO              0x08
 #define EFI_ACPI_6_5_GENERIC_SERIAL_BUS              0x09
 #define EFI_ACPI_6_5_PLATFORM_COMMUNICATION_CHANNEL  0x0A
+#define EFI_ACPI_6_5_PLATFORM_RUNTIME_MECHANISM      0x0B
 #define EFI_ACPI_6_5_FUNCTIONAL_FIXED_HARDWARE       0x7F
 
 //
@@ -525,6 +536,7 @@ typedef struct {
   UINT8     ProcessorPowerEfficiencyClass;
   UINT8     Reserved2;
   UINT16    SpeOverflowInterrupt;
+  UINT16    TrbeInterrupt;
 } EFI_ACPI_6_5_GIC_STRUCTURE;
 
 ///
@@ -533,6 +545,7 @@ typedef struct {
 #define EFI_ACPI_6_5_GIC_ENABLED                            BIT0
 #define EFI_ACPI_6_5_PERFORMANCE_INTERRUPT_MODEL            BIT1
 #define EFI_ACPI_6_5_VGIC_MAINTENANCE_INTERRUPT_MODE_FLAGS  BIT2
+#define EFI_ACPI_6_5_GIC_ONLINE_CAPABLE                     BIT3
 
 ///
 /// GIC Distributor Structure
